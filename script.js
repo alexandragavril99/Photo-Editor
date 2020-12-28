@@ -1,25 +1,52 @@
 const app = {
-  offscreenCanvas: null,
+  invisibleCanvas: null,
   canvas: null,
-  currentEffect: "normal",
 };
 
 app.draw = function () {
-  switch (app.currentEffect) {
-    case "normal":
-      const context = app.canvas.getContext("2d");
-      context.drawImage(app.offscreenCanvas, 0, 0);
-      break;
-  }
+  console.log(app.canvas.clientHeight);
+  console.log(app.canvas.clientWidth);
+  console.log(app.canvas.height);
+  console.log(app.canvas.width);
+  const context = app.canvas.getContext("2d");
+  context.drawImage(app.invisibleCanvas, 0, 0);
 };
 
 app.load = function () {
   app.canvas = document.getElementById("canvas");
 
-  app.offscreenCanvas = document.createElement("canvas");
+  app.invisibleCanvas = document.createElement("canvas");
 
-  let fileBrowser = document.getElementById("fileBrowser");
-  fileBrowser.addEventListener("change", function (ev) {
+  const context = app.canvas.getContext("2d");
+
+  let x = 0;
+  let y = 0;
+  let x1 = 0;
+  let y1 = 0;
+  let click = 0;
+
+  app.canvas.addEventListener("mousedown", (ev) => {
+    x = (ev.offsetX * app.canvas.width) / app.canvas.clientWidth;
+    y = (ev.offsetY * app.canvas.height) / app.canvas.clientHeight;
+    console.log(x + " " + y);
+  });
+
+  app.canvas.addEventListener("mouseup", (ev) => {
+    x1 = (ev.offsetX * app.canvas.width) / app.canvas.clientWidth;
+    y1 = (ev.offsetY * app.canvas.height) / app.canvas.clientHeight;
+    console.log(x1 + " " + y1);
+    context.beginPath();
+    context.rect(x, y, x1 - x, y1 - y);
+    context.stroke();
+  });
+
+  let deleteBtn = document.getElementById("delete");
+  deleteBtn.addEventListener("click", (ev) => {
+    context.clearRect(x, y, x1 - x, y1 - y);
+  });
+
+  let inputFile = document.getElementById("inputFile");
+  inputFile.addEventListener("change", function (ev) {
     const files = ev.target.files;
     // console.log(files);
 
@@ -27,23 +54,22 @@ app.load = function () {
 
     reader.addEventListener("load", function (ev) {
       //ev de load declansat atunci cand citirea s-a incheiat cu succes
-      const dataUrl = ev.target.result; //preluam url-ul fisierului incarcat
-      console.log(ev.target);
+      const dataURL = ev.target.result; //preluam url-ul fisierului incarcat
+      //console.log(ev.target);
 
       const img = document.createElement("img");
       img.addEventListener("load", function (ev) {
         //s-a incarcat imaginea
-        app.canvas.width = app.offscreenCanvas.width = img.naturalWidth;
+        app.canvas.width = app.invisibleCanvas.width = img.naturalWidth;
 
-        app.canvas.height = app.offscreenCanvas.height = img.naturalHeight;
+        app.canvas.height = app.invisibleCanvas.height = img.naturalHeight;
 
-        const oContext = app.offscreenCanvas.getContext("2d");
+        const oContext = app.invisibleCanvas.getContext("2d");
         oContext.drawImage(ev.target, 0, 0);
 
-        app.currentEffect = "normal";
         app.draw();
       });
-      img.src = dataUrl; //incepe incarcarea imaginii
+      img.src = dataURL; //incepe incarcarea imaginii
       //este posibil ca imaginea sa nu se fi incarcat
     });
 

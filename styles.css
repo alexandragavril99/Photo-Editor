@@ -1,13 +1,14 @@
 body,
 html {
   margin: 0;
+  background: #ececec;
 }
 
 #nav {
   background-color: #ddb2be;
   color: #f6f6f6;
   width: 100%;
-  padding: 12px 0;
+  padding: 10px 0;
 }
 
 #inputDiv {
@@ -16,16 +17,11 @@ html {
 }
 
 #canvas {
-  /* border: 1px solid; */
-  /* position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); */
   margin-top: 20px;
   margin-bottom: 30px;
-  max-width: 100%;
+  max-width: 80%;
   max-height: 500px;
-  background: #ececec;
+  background: white;
 }
 
 .container {
@@ -34,8 +30,10 @@ html {
 }
 
 .bttnDownload {
-  /* position: fixed;
-  left: 50%;
-  transform: translate(-50%, 0); */
   bottom: 10px;
+}
+
+.selectBtn {
+  text-align: start;
+  margin: 10px 10px 0px 10px;
 }
