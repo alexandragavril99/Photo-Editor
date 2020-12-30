@@ -17,18 +17,25 @@
         <div id="inputDiv">
             <input id="inputFile" type="file" accept="image/*">
         </div>
-        <div class="selectBtn">
-            <button id="delete">Stergere zona selectata</button>
+        <div class="bttnDownload">
+            <button id="downloadBtn">Download</button>
+        </div>
+        <div class="selectBtns">
+            <button id="selectAllBtn">Selecteaza toata imaginea</button>
+            <button id="selectBtn">Selecteaza imaginea</button>
         </div>
         <div>
-            <span id="color"></span>
+            <div class="deleteBtn">
+                <button id="deleteBtn">Stergere selectie</button>
+            </div>
+            <canvas id="canvas">
+                Not supported.
+            </canvas>
         </div>
-        <canvas id="canvas">
-            Not supported.
+
+        <canvas id="histogramCanvas">
+            Not supported
         </canvas>
-        <div class="bttnDownload">
-            <button id="btnDownload">Download</button>
-        </div>
     </div>
 
 
