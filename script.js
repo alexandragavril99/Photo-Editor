@@ -1,8 +1,8 @@
 const app = {
   invisibleCanvas: null,
-  canvas: null
+  canvas: null,
+  histogramCanvas: null,
 };
-
 
 app.draw = function () {
   console.log(app.canvas.clientHeight);
@@ -13,9 +13,63 @@ app.draw = function () {
   context.drawImage(app.invisibleCanvas, 0, 0);
 };
 
+class BarChart {
+  constructor(barChartCanvas) {
+    this.barChartCanvas = barChartCanvas;
+  }
+  drawChart(values) {
+    let context = this.barChartCanvas.getContext("2d");
+
+    let maxValue = Math.max(...values);
+    let f = this.barChartCanvas.height / maxValue;
+
+    let barWidth = this.barChartCanvas.width / values.length;
+    context.clearRect(
+      0,
+      0,
+      this.barChartCanvas.width,
+      this.barChartCanvas.height
+    );
+
+    context.save();
+
+    context.rotate(Math.PI);
+    context.translate(0, -this.barChartCanvas.height);
+    context.scale(-1, f);
+
+    for (let i = 0; i < values.length; i++) {
+      context.fillRect(i * barWidth, 0, barWidth * 0.9, values[i]);
+    }
+
+    context.restore();
+  }
+}
+
+function drawHistogram(barChart, imageBarChart) {
+  let v = [];
+  for (let i = 0; i < 256; i++) {
+    v[i] = 0;
+  }
+  let data = imageBarChart.data; // luam pixelii
+
+  //console.log(data);
+  for (let i = 0; i < data.length; i += 4) {
+    let r = data[i];
+    let g = data[i + 1];
+    let b = data[i + 2];
+    //let a = data[i+3];
+    let average = Math.round((r + g + b) / 3);
+    v[average]++;
+  }
+  barChart.drawChart(v); //apelam functia de desenare a histogramei pe vectorul cu valori v
+}
+
 app.load = function () {
   app.canvas = document.getElementById("canvas");
   const context = app.canvas.getContext("2d");
+
+  app.histogramCanvas = document.getElementById("histogramCanvas");
+  let barChart = new BarChart(app.histogramCanvas);
 
   app.invisibleCanvas = document.createElement("canvas");
 
@@ -41,6 +95,7 @@ app.load = function () {
 
   let click = 0; // variabila cu care verificam daca am finalizat selectia
   let mouseMove = 0; //variabila care verifica daca selectia este in miscare
+  let imageBarChart; //variabila care va prelua selectia curenta pentru realizarea histogramei de culoare
 
   let selectBtn = document.getElementById("selectBtn");
 
@@ -71,6 +126,10 @@ app.load = function () {
         context.putImageData(image, 0, 0);
         x1 = (ev.offsetX * app.canvas.width) / app.canvas.clientWidth;
         y1 = (ev.offsetY * app.canvas.height) / app.canvas.clientHeight;
+        if (x1 - x !== 0 && y1 - y !== 0) {
+          imageBarChart = context.getImageData(x, y, x1 - x, y1 - y);
+        }
+        drawHistogram(barChart, imageBarChart);
         context.beginPath();
         context.rect(x, y, x1 - x, y1 - y);
         context.stroke();
@@ -84,6 +143,10 @@ app.load = function () {
         context.putImageData(image, 0, 0);
         x1 = (ev.offsetX * app.canvas.width) / app.canvas.clientWidth;
         y1 = (ev.offsetY * app.canvas.height) / app.canvas.clientHeight;
+        if (x1 - x !== 0 && y1 - y !== 0) {
+          imageBarChart = context.getImageData(x, y, x1 - x, y1 - y);
+        }
+        drawHistogram(barChart, imageBarChart);
         console.log(x1 + " " + y1);
         context.beginPath();
         context.rect(x, y, x1 - x, y1 - y);
@@ -144,6 +207,7 @@ app.load = function () {
         invisibleContext.drawImage(ev.target, 0, 0);
 
         app.draw(); //functie care incarca imaginea in cadrul canvasului
+        //drawHistogram(barChart);
       });
       image.src = dataURL; //incepe incarcarea imaginii
       //este posibil ca imaginea sa nu se fi incarcat
