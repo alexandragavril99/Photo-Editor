@@ -129,7 +129,9 @@ app.load = function () {
         if (x1 - x !== 0 && y1 - y !== 0) {
           imageBarChart = context.getImageData(x, y, x1 - x, y1 - y);
         }
-        drawHistogram(barChart, imageBarChart);
+        if (imageBarChart) {
+          drawHistogram(barChart, imageBarChart);
+        }
         context.beginPath();
         context.rect(x, y, x1 - x, y1 - y);
         context.stroke();
@@ -146,7 +148,9 @@ app.load = function () {
         if (x1 - x !== 0 && y1 - y !== 0) {
           imageBarChart = context.getImageData(x, y, x1 - x, y1 - y);
         }
-        drawHistogram(barChart, imageBarChart);
+        if (imageBarChart) {
+          drawHistogram(barChart, imageBarChart);
+        }
         console.log(x1 + " " + y1);
         context.beginPath();
         context.rect(x, y, x1 - x, y1 - y);
@@ -186,6 +190,8 @@ app.load = function () {
   });
 
   let inputFile = document.getElementById("inputFile");
+  let imageCanvas;
+
   inputFile.addEventListener("change", function (ev) {
     const files = ev.target.files;
     // console.log(files);
@@ -197,11 +203,12 @@ app.load = function () {
       const dataURL = ev.target.result; //preluam url-ul fisierului incarcat
       //console.log(ev.target);
 
-      const image = document.createElement("img");
-      image.addEventListener("load", function (ev) {
+      imageCanvas = document.createElement("img");
+      imageCanvas.addEventListener("load", function (ev) {
         //s-a incarcat imaginea
-        app.canvas.width = app.invisibleCanvas.width = image.naturalWidth;
-        app.canvas.height = app.invisibleCanvas.height = image.naturalHeight;
+        app.canvas.width = app.invisibleCanvas.width = imageCanvas.naturalWidth;
+        app.canvas.height = app.invisibleCanvas.height =
+          imageCanvas.naturalHeight;
 
         const invisibleContext = app.invisibleCanvas.getContext("2d");
         invisibleContext.drawImage(ev.target, 0, 0);
@@ -209,13 +216,50 @@ app.load = function () {
         app.draw(); //functie care incarca imaginea in cadrul canvasului
         //drawHistogram(barChart);
       });
-      image.src = dataURL; //incepe incarcarea imaginii
+      imageCanvas.src = dataURL; //incepe incarcarea imaginii
       //este posibil ca imaginea sa nu se fi incarcat
     });
 
     if (files[0]) {
       //verificam daca userul a incarcat un fisier
       reader.readAsDataURL(files[0]);
+    }
+  });
+
+  let cropBtn = document.getElementById("cropBtn");
+
+  //crop pentru selectia curenta
+  cropBtn.addEventListener("click", () => {
+    if (x && y) {
+      app.invisibleCanvas = null;
+      app.invisibleCanvas = document.createElement("canvas");
+
+      let clientWidth = app.canvas.clientWidth;
+      let clientHeight = app.canvas.clientHeight;
+
+      let width = app.canvas.width;
+      let height = app.canvas.height;
+
+      //redimensionarea canvasului
+      app.canvas.width = app.invisibleCanvas.width =
+        ((x1 - x) * clientWidth) / width;
+      app.canvas.height = app.invisibleCanvas.height =
+        ((y1 - y) * clientHeight) / height;
+
+      const invisibleContext = app.invisibleCanvas.getContext("2d");
+      invisibleContext.drawImage(
+        imageCanvas,
+        x,
+        y,
+        x1 - x,
+        y1 - y,
+        0,
+        0,
+        app.invisibleCanvas.width,
+        app.invisibleCanvas.height
+      );
+
+      context.drawImage(app.invisibleCanvas, 0, 0);
     }
   });
 };
