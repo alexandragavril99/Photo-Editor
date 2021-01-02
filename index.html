@@ -23,6 +23,18 @@
             <button id="selectBtn">Selecteaza imaginea</button>
             <button id="deleteBtn">Stergere selectie</button>
             <button id="cropBtn">Crop</button>
+            <button data-effect="normal">Normal</button>
+            <button data-effect="BlackAndWhite">Black and white</button>
+            <button data-effect="brighter">Brighter</button>
+            <button data-effect="darker">Darker</button>
+            <button data-effect="neon">Neon</button>
+            <br>
+            <label>Noua latime:</label>
+            <input type="number" id="newWidth" placeholder="New Width">
+            <button id="newWidthBtn">Introdu noua latime</button>
+            <label>Noua inaltime:</label>
+            <input type="number" id="newHeight" placeholder="New Height">
+            <button>Introdu noua inaltime</button>
         </div>
         <div class="canvas">
             <canvas id="canvas">
@@ -34,8 +46,6 @@
             Not supported
         </canvas>
     </div>
-
-
 </body>
 <script>
     "use strict";

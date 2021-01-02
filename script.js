@@ -2,15 +2,8 @@ const app = {
   invisibleCanvas: null,
   canvas: null,
   histogramCanvas: null,
-};
-
-app.draw = function () {
-  console.log(app.canvas.clientHeight);
-  console.log(app.canvas.clientWidth);
-  console.log(app.canvas.height);
-  console.log(app.canvas.width);
-  const context = app.canvas.getContext("2d");
-  context.drawImage(app.invisibleCanvas, 0, 0);
+  effectCanvas: null,
+  currentEffect: "normal",
 };
 
 class BarChart {
@@ -45,6 +38,7 @@ class BarChart {
   }
 }
 
+//functie care furnizeaza valorile ce vor fi reprezentate in histograma
 function drawHistogram(barChart, imageBarChart) {
   let v = [];
   for (let i = 0; i < 256; i++) {
@@ -64,6 +58,110 @@ function drawHistogram(barChart, imageBarChart) {
   barChart.drawChart(v); //apelam functia de desenare a histogramei pe vectorul cu valori v
 }
 
+//functie ce modifica efectul curent si il aplica in cadrul selectiei
+app.changeEffect = function (effect, x, y, x1, y1) {
+  if (app.currentEffect !== effect) {
+    app.currentEffect = effect;
+  }
+  switch (app.currentEffect) {
+    case "normal":
+      const effectContext = app.effectCanvas.getContext("2d");
+      const imageData = effectContext.getImageData(x, y, x1 - x, y1 - y);
+
+      const iContext = app.invisibleCanvas.getContext("2d");
+      const context = app.canvas.getContext("2d");
+      app.compareCoordinates(context, iContext, x, y, x1, y1, imageData);
+      break;
+    case "BlackAndWhite":
+      app.BlackAndWhite(x, y, x1, y1);
+      break;
+    case "darker":
+      app.BrighterOrDarker(50, x, y, x1, y1);
+      break;
+    case "brighter":
+      app.BrighterOrDarker(-50, x, y, x1, y1);
+      break;
+    case "neon":
+      app.neon(x, y, x1, y1);
+      break;
+  }
+};
+
+//efect alb-negru
+app.BlackAndWhite = function (x, y, x1, y1) {
+  //gri -> r = g = b
+  const effectContext = app.effectCanvas.getContext("2d");
+  const imageData = effectContext.getImageData(x, y, x1 - x, y1 - y);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+
+    const average = Math.round((r + g + b) / 3);
+    data[i] = data[i + 1] = data[i + 2] = average;
+  }
+
+  const invisibleContext = app.invisibleCanvas.getContext("2d");
+  const context = app.canvas.getContext("2d");
+  app.compareCoordinates(context, invisibleContext, x, y, x1, y1, imageData);
+};
+
+//efect pt o poza mai inchisa/mai deschia
+app.BrighterOrDarker = function (v, x, y, x1, y1) {
+  const effectContext = app.effectCanvas.getContext("2d");
+  const imageData = effectContext.getImageData(x, y, x1 - x, y1 - y);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = data[i] - v; //r
+    data[i + 1] = data[i + 1] - v; //g
+    data[i + 2] = data[i + 2] - v; //b
+  }
+
+  const context = app.canvas.getContext("2d");
+  const invisibleContext = app.invisibleCanvas.getContext("2d");
+  app.compareCoordinates(context, invisibleContext, x, y, x1, y1, imageData);
+};
+
+//efect neon
+app.neon = function (x, y, x1, y1) {
+  //Hint: r' = r - v; g' = g - v; b' = b - v;
+  const effectContext = app.effectCanvas.getContext("2d");
+  const imageData = effectContext.getImageData(x, y, x1 - x, y1 - y);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    data[i + 4] = 150;
+  }
+
+  const invisibleContext = app.invisibleCanvas.getContext("2d");
+  const context = app.canvas.getContext("2d");
+  app.compareCoordinates(context, invisibleContext, x, y, x1, y1, imageData);
+};
+
+//functie care selecteaza zona pentru aplicarea efectului indiferent de unde incepe selectia
+app.compareCoordinates = function (context, iContext, x, y, x1, y1, imageData) {
+  if (x < x1 && y < y1) {
+    //stanga sus
+    context.putImageData(imageData, x, y);
+    iContext.putImageData(imageData, x, y);
+  } else if (x > x1 && y1 > y) {
+    //dreapta sus
+    context.putImageData(imageData, x1, y);
+    iContext.putImageData(imageData, x1, y);
+  } else if (x1 < x && y1 < y) {
+    //dreapta jos
+    context.putImageData(imageData, x1, y1);
+    iContext.putImageData(imageData, x1, y1);
+  } else if (x < x1 && y > y1) {
+    //stanga jos
+    context.putImageData(imageData, x, y1);
+    iContext.putImageData(imageData, x, y1);
+  }
+};
+
 app.load = function () {
   app.canvas = document.getElementById("canvas");
   const context = app.canvas.getContext("2d");
@@ -72,6 +170,7 @@ app.load = function () {
   let barChart = new BarChart(app.histogramCanvas);
 
   app.invisibleCanvas = document.createElement("canvas");
+  app.effectCanvas = document.createElement("canvas");
 
   let clickSelectAllBtn = 0; //variabila cu care verificam daca am selectat intreaga imagine
   let image; //variabila ce va retine un obiect de tip ImageData
@@ -190,8 +289,9 @@ app.load = function () {
   });
 
   let inputFile = document.getElementById("inputFile");
-  let imageCanvas;
+  let imageCanvas; //imaginea incarcata in canvas
 
+  //incarcare poza
   inputFile.addEventListener("change", function (ev) {
     const files = ev.target.files;
     // console.log(files);
@@ -206,15 +306,21 @@ app.load = function () {
       imageCanvas = document.createElement("img");
       imageCanvas.addEventListener("load", function (ev) {
         //s-a incarcat imaginea
-        app.canvas.width = app.invisibleCanvas.width = imageCanvas.naturalWidth;
-        app.canvas.height = app.invisibleCanvas.height =
+        app.canvas.width = app.invisibleCanvas.width = app.effectCanvas.width =
+          imageCanvas.naturalWidth;
+        app.canvas.height = app.invisibleCanvas.height = app.effectCanvas.height =
           imageCanvas.naturalHeight;
 
         const invisibleContext = app.invisibleCanvas.getContext("2d");
         invisibleContext.drawImage(ev.target, 0, 0);
 
-        app.draw(); //functie care incarca imaginea in cadrul canvasului
-        //drawHistogram(barChart);
+        console.log(app.canvas.clientHeight);
+        console.log(app.canvas.clientWidth);
+        console.log(app.canvas.height);
+        console.log(app.canvas.width);
+        const context = app.canvas.getContext("2d");
+        context.drawImage(app.invisibleCanvas, 0, 0); //incarcam imaginea in cadrul canvasului
+        app.effectCanvas.getContext("2d").drawImage(app.invisibleCanvas, 0, 0);
       });
       imageCanvas.src = dataURL; //incepe incarcarea imaginii
       //este posibil ca imaginea sa nu se fi incarcat
@@ -231,35 +337,94 @@ app.load = function () {
   //crop pentru selectia curenta
   cropBtn.addEventListener("click", () => {
     if (x && y) {
+      let cropCanvas = app.invisibleCanvas;
       app.invisibleCanvas = null;
       app.invisibleCanvas = document.createElement("canvas");
 
       let clientWidth = app.canvas.clientWidth;
-      let clientHeight = app.canvas.clientHeight;
+      let clientHeight = app.canvas.clientHeight; //dimensiunile canvasului
 
       let width = app.canvas.width;
-      let height = app.canvas.height;
+      let height = app.canvas.height; //dimensiunea pozei
 
       //redimensionarea canvasului
       app.canvas.width = app.invisibleCanvas.width =
-        ((x1 - x) * clientWidth) / width;
+        (Math.abs(x1 - x) * clientWidth) / width;
       app.canvas.height = app.invisibleCanvas.height =
-        ((y1 - y) * clientHeight) / height;
+        (Math.abs(y1 - y) * clientHeight) / height;
 
       const invisibleContext = app.invisibleCanvas.getContext("2d");
-      invisibleContext.drawImage(
-        imageCanvas,
-        x,
-        y,
-        x1 - x,
-        y1 - y,
-        0,
-        0,
-        app.invisibleCanvas.width,
-        app.invisibleCanvas.height
-      );
-
-      context.drawImage(app.invisibleCanvas, 0, 0);
+      if (cropCanvas) {
+        if (x < x1 && y < y1) {
+          //stanga sus
+          invisibleContext.drawImage(
+            cropCanvas,
+            x,
+            y,
+            x1 - x,
+            y1 - y,
+            0,
+            0,
+            app.invisibleCanvas.width,
+            app.invisibleCanvas.height
+          );
+        } else if (x > x1 && y1 > y) {
+          //dreapta sus
+          invisibleContext.drawImage(
+            cropCanvas,
+            x1,
+            y,
+            Math.abs(x1 - x),
+            Math.abs(y1 - y),
+            0,
+            0,
+            app.invisibleCanvas.width,
+            app.invisibleCanvas.height
+          );
+        } else if (x1 < x && y1 < y) {
+          invisibleContext.drawImage(
+            //dreapta jos
+            cropCanvas,
+            x1,
+            y1,
+            Math.abs(x1 - x),
+            Math.abs(y1 - y),
+            0,
+            0,
+            app.invisibleCanvas.width,
+            app.invisibleCanvas.height
+          );
+        } else if (x < x1 && y > y1) {
+          invisibleContext.drawImage(
+            //stanga jos
+            cropCanvas,
+            x,
+            y1,
+            Math.abs(x1 - x),
+            Math.abs(y1 - y),
+            0,
+            0,
+            app.invisibleCanvas.width,
+            app.invisibleCanvas.height
+          );
+        }
+        context.drawImage(app.invisibleCanvas, 0, 0);
+        app.effectCanvas.getContext("2d").drawImage(app.invisibleCanvas, 0, 0);
+      }
     }
   });
+
+  const buttons = document.querySelectorAll("button[data-effect]");
+
+  for (let i = 0; i < buttons.length; i++) {
+    //adaugam fiecarui butonul evenimentul de click in functie de efectul sau
+    buttons[i].addEventListener("click", function (ev) {
+      const button = ev.target;
+      const effect = button.dataset.effect;
+      if ((x, y, x1, y1)) {
+        //apelam functia de schimbare a efectului in functie de butonul apasat
+        app.changeEffect(effect, x, y, x1, y1);
+      }
+    });
+  }
 };
