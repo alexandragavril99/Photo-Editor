@@ -108,7 +108,7 @@ app.BlackAndWhite = function (x, y, x1, y1) {
   app.compareCoordinates(context, invisibleContext, x, y, x1, y1, imageData);
 };
 
-//efect pt o poza mai inchisa/mai deschia
+//efect pt o poza mai inchisa/mai deschisa
 app.BrighterOrDarker = function (v, x, y, x1, y1) {
   const effectContext = app.effectCanvas.getContext("2d");
   const imageData = effectContext.getImageData(x, y, x1 - x, y1 - y);
@@ -412,6 +412,39 @@ app.load = function () {
         app.effectCanvas.getContext("2d").drawImage(app.invisibleCanvas, 0, 0);
       }
     }
+  });
+
+  let newWidthBtn = document.getElementById("newWidthBtn");
+
+  newWidthBtn.addEventListener("click", () => {
+    let tbValue = document.getElementById("newWidth");
+    let newWidth = tbValue.value;
+    let newHeight =
+      newWidth * (app.invisibleCanvas.height / app.invisibleCanvas.width);
+    console.log(newWidth, newHeight);
+
+    // context.clearRect(0, 0, app.canvas.width, app.canvas.height);
+    app.canvas.width = app.invisibleCanvas.width = newWidth;
+    // (newWidth * clientWidth) / width;
+    app.canvas.height = app.invisibleCanvas.height = newHeight;
+    //  (newHeight * clientHeight) / height;
+
+    const invisibleContext = app.invisibleCanvas.getContext("2d");
+    invisibleContext.drawImage(
+      imageCanvas,
+      0,
+      0,
+      app.invisibleCanvas.width,
+      app.invisibleCanvas.height
+    );
+    context.drawImage(
+      imageCanvas,
+      0,
+      0,
+      app.invisibleCanvas.width,
+      app.invisibleCanvas.height
+    );
+    console.log(app.canvas.width, app.canvas.height);
   });
 
   const buttons = document.querySelectorAll("button[data-effect]");

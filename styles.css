@@ -18,10 +18,10 @@ html {
 
 #canvas {
   /* margin-top: 20px; */
-  margin-bottom: 10px;
-  max-width: 60%;
-  max-height: 500px;
+  margin: 0 50px 0 40px;
   background: white;
+  max-width: 800px;
+  max-height: 500px;
 }
 
 .canvas {
@@ -33,15 +33,42 @@ html {
   margin-bottom: 20px;
 }
 .divCanvasBtns {
-  margin: 10px 10px 10px 10px;
-  /* display: flex;
-  flex-direction: column;
-  align-items: start; */
-  /* display: flex;
-  align-items: center;
-  justify-content: flex-start; */
-  /* float: left;
-  display: table-cell;
-  flex-direction: column; */
+  /* margin: 10px 10px 10px 10px; */
+  margin: 10px auto;
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  transform: translate(-50%, -50%);
 }
 
+.coloanaStg {
+  display: flex;
+  flex-direction: column;
+  margin-left: 60px;
+}
+
+.coloanaDrpt {
+  display: flex;
+  flex-direction: column;
+}
+
+#histogramCanvas {
+  margin-left: -200px;
+  margin-top: 50px;
+}
+
+.coloanaStg button {
+  width: 90px;
+  margin-top: 10px;
+}
+.coloanaDrpt button,
+label {
+  width: 90px;
+  margin-top: 10px;
+}
+.coloanaDrpt input {
+  width: 83px;
+  margin-top: 10px;
+}
