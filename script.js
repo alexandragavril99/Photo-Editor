@@ -1,9 +1,9 @@
 const app = {
-  invisibleCanvas: null,
-  canvas: null,
-  histogramCanvas: null,
-  effectCanvas: null,
-  currentEffect: "normal",
+  invisibleCanvas: null, //copie a canvasului
+  canvas: null, //canvasl vizibil
+  histogramCanvas: null, //canvas pentru histograma
+  effectCanvas: null, //retine imaginea fara efect pentru a le putea aplica fara sa se amestece
+  currentEffect: "normal", //retine efectul curent al selectiei
 };
 
 class BarChart {
@@ -167,7 +167,7 @@ app.load = function () {
   const context = app.canvas.getContext("2d");
 
   app.histogramCanvas = document.getElementById("histogramCanvas");
-  let barChart = new BarChart(app.histogramCanvas);
+  let barChart = new BarChart(app.histogramCanvas); //cream o instanta de tip BarChart
 
   app.invisibleCanvas = document.createElement("canvas");
   app.effectCanvas = document.createElement("canvas");
@@ -315,9 +315,10 @@ app.load = function () {
         invisibleContext.drawImage(ev.target, 0, 0);
 
         console.log(app.canvas.clientHeight);
-        console.log(app.canvas.clientWidth);
+        console.log(app.canvas.clientWidth); //dimensiunile canvasului
         console.log(app.canvas.height);
-        console.log(app.canvas.width);
+        console.log(app.canvas.width); //dimensiunile pozei
+
         const context = app.canvas.getContext("2d");
         context.drawImage(app.invisibleCanvas, 0, 0); //incarcam imaginea in cadrul canvasului
         app.effectCanvas.getContext("2d").drawImage(app.invisibleCanvas, 0, 0);
@@ -420,14 +421,12 @@ app.load = function () {
     let tbValue = document.getElementById("newWidth");
     let newWidth = tbValue.value;
     let newHeight =
-      newWidth * (app.invisibleCanvas.height / app.invisibleCanvas.width);
-    console.log(newWidth, newHeight);
+      newWidth * (app.invisibleCanvas.height / app.invisibleCanvas.width); //calculam noua inaltime
 
-    // context.clearRect(0, 0, app.canvas.width, app.canvas.height);
+    console.log(newWidth + " " + newHeight);
+
     app.canvas.width = app.invisibleCanvas.width = newWidth;
-    // (newWidth * clientWidth) / width;
-    app.canvas.height = app.invisibleCanvas.height = newHeight;
-    //  (newHeight * clientHeight) / height;
+    app.canvas.height = app.invisibleCanvas.height = newHeight; //reinitializam dimensiunile canvasului
 
     const invisibleContext = app.invisibleCanvas.getContext("2d");
     invisibleContext.drawImage(
@@ -444,7 +443,36 @@ app.load = function () {
       app.invisibleCanvas.width,
       app.invisibleCanvas.height
     );
-    console.log(app.canvas.width, app.canvas.height);
+  });
+
+  let newHeightBtn = document.getElementById("newHeightBtn");
+
+  newHeightBtn.addEventListener("click", () => {
+    let tbValue = document.getElementById("newHeight");
+    let newHeight = tbValue.value;
+    let newWidth =
+      newHeight * (app.invisibleCanvas.width / app.invisibleCanvas.height); //calculam noua latime
+
+    console.log(newWidth + " " + newHeight);
+
+    app.canvas.width = app.invisibleCanvas.width = newWidth;
+    app.canvas.height = app.invisibleCanvas.height = newHeight; //reinitializam dimensiunile canvasului
+
+    const invisibleContext = app.invisibleCanvas.getContext("2d");
+    invisibleContext.drawImage(
+      imageCanvas,
+      0,
+      0,
+      app.invisibleCanvas.width,
+      app.invisibleCanvas.height
+    );
+    context.drawImage(
+      imageCanvas,
+      0,
+      0,
+      app.invisibleCanvas.width,
+      app.invisibleCanvas.height
+    );
   });
 
   const buttons = document.querySelectorAll("button[data-effect]");

@@ -19,10 +19,10 @@
             <button id="downloadBtn">Download</button>
         </div>
         <div class="divCanvasBtns">
-            <div class="coloanaStg">
-                <button id="selectAllBtn">Selecteaza toata imaginea</button>
-                <button id="selectBtn">Selecteaza imaginea</button>
-                <button id="deleteBtn">Stergere selectie</button>
+            <div class="leftColumn">
+                <button id="selectAllBtn">Select all</button>
+                <button id="selectBtn">Select image</button>
+                <button id="deleteBtn">Delete selection</button>
                 <button id="cropBtn">Crop</button>
                 <div class="histogramCanvas">
                     <canvas id="histogramCanvas">
@@ -35,18 +35,18 @@
                     Not supported.
                 </canvas>
             </div>
-            <div class="coloanaDrpt">
+            <div class="rightColumn">
                 <button data-effect="normal">Normal</button>
                 <button data-effect="BlackAndWhite">Black and white</button>
                 <button data-effect="brighter">Brighter</button>
                 <button data-effect="darker">Darker</button>
                 <button data-effect="neon">Neon</button>
-                <label>Noua latime:</label>
+                <label>New width:</label>
                 <input type="number" id="newWidth" placeholder="New Width">
-                <button id="newWidthBtn">Introdu noua latime</button>
-                <label>Noua inaltime:</label>
+                <button id="newWidthBtn">Enter new width</button>
+                <label>New height:</label>
                 <input type="number" id="newHeight" placeholder="New Height">
-                <button>Introdu noua inaltime</button>
+                <button id="newHeightBtn">Enter new height</button>
             </div>
         </div>
     </div>
