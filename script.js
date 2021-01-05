@@ -1,6 +1,6 @@
 const app = {
   invisibleCanvas: null, //copie a canvasului
-  canvas: null, //canvasl vizibil
+  canvas: null, //canvasul vizibil
   histogramCanvas: null, //canvas pentru histograma
   effectCanvas: null, //retine imaginea fara efect pentru a le putea aplica fara sa se amestece
   currentEffect: "normal", //retine efectul curent al selectiei
