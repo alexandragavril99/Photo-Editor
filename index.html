@@ -19,33 +19,38 @@
             <button id="downloadBtn">Download</button>
         </div>
         <div class="divCanvasBtns">
-            <button id="selectAllBtn">Selecteaza toata imaginea</button>
-            <button id="selectBtn">Selecteaza imaginea</button>
-            <button id="deleteBtn">Stergere selectie</button>
-            <button id="cropBtn">Crop</button>
-            <button data-effect="normal">Normal</button>
-            <button data-effect="BlackAndWhite">Black and white</button>
-            <button data-effect="brighter">Brighter</button>
-            <button data-effect="darker">Darker</button>
-            <button data-effect="neon">Neon</button>
-            <br>
-            <label>Noua latime:</label>
-            <input type="number" id="newWidth" placeholder="New Width">
-            <button id="newWidthBtn">Introdu noua latime</button>
-            <label>Noua inaltime:</label>
-            <input type="number" id="newHeight" placeholder="New Height">
-            <button>Introdu noua inaltime</button>
+            <div class="leftColumn">
+                <button id="selectAllBtn">Select all</button>
+                <button id="selectBtn">Select image</button>
+                <button id="deleteBtn">Delete selection</button>
+                <button id="cropBtn">Crop</button>
+                <div class="histogramCanvas">
+                    <canvas id="histogramCanvas">
+                        Not supported
+                    </canvas>
+                </div>
+            </div>
+            <div class="canvas">
+                <canvas id="canvas">
+                    Not supported.
+                </canvas>
+            </div>
+            <div class="rightColumn">
+                <button data-effect="normal">Normal</button>
+                <button data-effect="BlackAndWhite">Black and white</button>
+                <button data-effect="brighter">Brighter</button>
+                <button data-effect="darker">Darker</button>
+                <button data-effect="neon">Neon</button>
+                <label>New width:</label>
+                <input type="number" id="newWidth" placeholder="New Width">
+                <button id="newWidthBtn">Enter new width</button>
+                <label>New height:</label>
+                <input type="number" id="newHeight" placeholder="New Height">
+                <button id="newHeightBtn">Enter new height</button>
+            </div>
         </div>
-        <div class="canvas">
-            <canvas id="canvas">
-                Not supported.
-            </canvas>
-        </div>
-
-        <canvas id="histogramCanvas">
-            Not supported
-        </canvas>
     </div>
+
 </body>
 <script>
     "use strict";
