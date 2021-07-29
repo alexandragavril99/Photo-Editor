@@ -1,3 +1,10 @@
-# Multimedia_Proiect
+# Photo Editor - Multimedia Project
 
-Photo Editor - javascript + html + css
+Photo Editor - JavaScript + HTML + CSS
+
+*Main functionalities:*
+ - upload/download photos
+ - crop/resize photos
+ - apply different effects
+
+
